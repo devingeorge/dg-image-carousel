@@ -105,53 +105,68 @@ app.post('/slack/carousel', async (req, res) => {
  */
 app.post('/slack/interactive', async (req, res) => {
   try {
+    console.log('🔗 Interactive event received');
+    console.log('Headers:', req.headers);
+    console.log('Body length:', req.body?.length);
+    
     // Verify the request came from Slack
     const timestamp = req.headers['x-slack-request-timestamp'];
     const signature = req.headers['x-slack-signature'];
     
     if (!timestamp || !signature) {
+      console.error('❌ Missing Slack headers');
       return res.status(400).json({ error: 'Missing Slack headers' });
     }
 
     // Check if request is recent
     if (!isRecentRequest(timestamp)) {
+      console.error('❌ Request too old');
       return res.status(400).json({ error: 'Request too old' });
     }
 
     // Verify signature
     if (!verifySlackRequest(process.env.SLACK_SIGNING_SECRET, timestamp, req.body, signature)) {
+      console.error('❌ Invalid signature');
       return res.status(400).json({ error: 'Invalid signature' });
     }
 
     // Parse the payload
     const payload = JSON.parse(req.body.toString());
+    console.log('📦 Parsed payload:', JSON.stringify(payload, null, 2));
+    
     const { actions, response_url } = payload;
 
     if (!actions || actions.length === 0) {
+      console.error('❌ No actions found');
       return res.status(400).json({ error: 'No actions found' });
     }
 
     // Get the button value (page number)
     const page = parseInt(actions[0].value);
+    console.log('📄 Requested page:', page);
     
     if (isNaN(page)) {
+      console.error('❌ Invalid page number:', actions[0].value);
       return res.status(400).json({ error: 'Invalid page number' });
     }
 
     // Build the new carousel for the requested page
     const carousel = getCarouselForPage(page);
+    console.log('🎠 Built carousel for page:', page);
 
     // Update the original message using the response_url
+    console.log('📤 Updating message via response_url:', response_url);
     await superagent
       .post(response_url)
       .set('Content-Type', 'application/json')
       .send(carousel);
 
+    console.log('✅ Message updated successfully');
     // Acknowledge the interaction
     res.status(200).send();
 
   } catch (error) {
-    console.error('Error handling interactive event:', error);
+    console.error('❌ Error handling interactive event:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
