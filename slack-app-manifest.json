@@ -16,7 +16,7 @@
         "description": "Display an interactive image carousel",
         "usage_hint": "[optional]",
         "should_escape": false,
-        "url": "https://your-domain.com/slack/command"
+        "url": "https://dg-image-carousel.onrender.com/slack/command"
       }
     ]
   },
@@ -33,12 +33,12 @@
   },
   "settings": {
     "event_subscriptions": {
-      "request_url": "https://your-domain.com/slack/events",
+      "request_url": "https://dg-image-carousel.onrender.com/slack/events",
       "bot_events": []
     },
     "interactivity": {
       "is_enabled": true,
-      "request_url": "https://your-domain.com/slack/interactive"
+      "request_url": "https://dg-image-carousel.onrender.com/slack/interactive"
     },
     "org_deploy_enabled": false,
     "socket_mode_enabled": false,
