@@ -157,43 +157,60 @@ app.post('/slack/interactive', async (req, res) => {
 });
 
 /**
- * Slash command endpoint (optional)
- * You can create a slash command in your Slack app that calls this endpoint
+ * Slash command endpoint
+ * Handles the /carousel slash command
  */
 app.post('/slack/command', async (req, res) => {
   try {
-    const { channel_id, user_id } = req.body;
+    console.log('📨 Slash command received:', req.body);
+    
+    const { channel_id, user_id, command, text } = req.body;
+    
+    // Validate required fields
+    if (!channel_id) {
+      console.error('Missing channel_id in slash command');
+      return res.status(400).json({ 
+        response_type: 'ephemeral',
+        text: 'Error: Missing channel information' 
+      });
+    }
     
     // Get the initial carousel
     const carousel = getInitialCarousel();
     
-    // Post the carousel
+    console.log('🎠 Posting carousel to channel:', channel_id);
+    
+    // Post the carousel directly to Slack
     const response = await superagent
       .post('https://slack.com/api/chat.postMessage')
       .set('Authorization', `Bearer ${process.env.SLACK_BOT_TOKEN}`)
       .set('Content-Type', 'application/json')
       .send({
         channel: channel_id,
+        text: 'Here\'s your interactive image carousel!',
         ...carousel
       });
 
+    console.log('📤 Slack API response:', response.body);
+
     if (response.body.ok) {
+      // Return a simple acknowledgment since we posted directly
       res.json({ 
-        response_type: 'in_channel',
-        text: 'Here\'s your image carousel!',
-        ...carousel
+        response_type: 'ephemeral',
+        text: 'Carousel posted successfully! 🎠'
       });
     } else {
+      console.error('Slack API error:', response.body.error);
       res.status(400).json({ 
         response_type: 'ephemeral',
-        text: `Error: ${response.body.error}` 
+        text: `Error posting carousel: ${response.body.error}` 
       });
     }
   } catch (error) {
     console.error('Error handling slash command:', error);
     res.status(500).json({ 
       response_type: 'ephemeral',
-      text: 'Internal server error' 
+      text: 'Internal server error - check logs for details' 
     });
   }
 });

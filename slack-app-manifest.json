@@ -15,7 +15,8 @@
         "command": "/carousel",
         "description": "Display an interactive image carousel",
         "usage_hint": "[optional]",
-        "should_escape": false
+        "should_escape": false,
+        "url": "https://your-domain.com/slack/command"
       }
     ]
   },
