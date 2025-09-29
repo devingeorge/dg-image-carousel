@@ -27,6 +27,38 @@ app.get('/health', (req, res) => {
 });
 
 /**
+ * Slack Event Subscriptions endpoint
+ * Handles Slack's URL verification challenge and event subscriptions
+ */
+app.post('/slack/events', (req, res) => {
+  try {
+    const { challenge, type } = req.body;
+    
+    // Handle URL verification challenge
+    if (type === 'url_verification') {
+      console.log('✅ Slack URL verification challenge received');
+      return res.status(200).send(challenge);
+    }
+    
+    // Handle event callbacks
+    if (type === 'event_callback') {
+      console.log('📨 Slack event received:', req.body.event?.type);
+      // For now, just acknowledge the event
+      // You can add specific event handling here if needed
+      return res.status(200).json({ ok: true });
+    }
+    
+    // Unknown event type
+    console.log('❓ Unknown Slack event type:', type);
+    return res.status(200).json({ ok: true });
+    
+  } catch (error) {
+    console.error('Error handling Slack event:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * Endpoint to post a new carousel to a channel
  * Usage: POST /slack/carousel with { channel: "channel-id" }
  */
@@ -182,6 +214,8 @@ app.listen(PORT, () => {
   console.log(`📱 Health check: http://localhost:${PORT}/health`);
   console.log(`🎠 Post carousel: POST http://localhost:${PORT}/slack/carousel`);
   console.log(`🔗 Interactive endpoint: POST http://localhost:${PORT}/slack/interactive`);
+  console.log(`📨 Events endpoint: POST http://localhost:${PORT}/slack/events`);
+  console.log(`⚡ Slash command: POST http://localhost:${PORT}/slack/command`);
   
   if (!process.env.SLACK_BOT_TOKEN) {
     console.warn('⚠️  SLACK_BOT_TOKEN not set in environment variables');
