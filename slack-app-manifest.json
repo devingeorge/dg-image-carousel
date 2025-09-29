@@ -1,0 +1,46 @@
+{
+  "display_information": {
+    "name": "Image Carousel Bot",
+    "description": "Interactive image carousel with navigation controls",
+    "background_color": "#2c2d30",
+    "long_description": "A beautiful interactive image carousel for Slack using Block Kit. Users can navigate through a collection of images using previous/next buttons with page indicators."
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Image Carousel Bot",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/carousel",
+        "description": "Display an interactive image carousel",
+        "usage_hint": "[optional]",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "chat:write",
+        "channels:read",
+        "groups:read",
+        "im:read",
+        "mpim:read"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://your-domain.com/slack/events",
+      "bot_events": []
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://your-domain.com/slack/interactive"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
